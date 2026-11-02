@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import 'dotenv/config'
 const app = express()
 const PORT = 5000
@@ -28,15 +28,49 @@ const CreateEventsCollection = db.collection('add-event')
 const BookingCollection = db.collection('booking')
 
 
-app.post('/add-create-events',async (req, res) => {
-   const data = req.body;
-   const result = await CreateEventsCollection.insertOne(data)
-   console.log(result);
-   res.send(result)
+app.post('/add-create-events', async (req, res) => {
+    const data = req.body;
+    const result = await CreateEventsCollection.insertOne(data)
+    console.log(result);
+    res.send(result)
 
 })
 
-app.get('/')
+app.get('/explore-event', async (req, res) => {
+    const result = await CreateEventsCollection.find().toArray()
+    res.send(result)
+
+})
+
+app.get('/explore-event/:id', async (req, res) => {
+    const { id } = req.params;
+    const result = await CreateEventsCollection.findOne({ _id: new ObjectId(id) })
+    res.send(result)
+})
+
+app.get('/manage-my-events/:email', async (req, res) => {
+    const email = req.params.email;
+    const result = await CreateEventsCollection.find({ email: email }).toArray()
+    res.send(result)
+})
+
+app.patch('/manage-my-events/:id', async (req, res) => {
+    const { id } = req.params
+    const data = req.body;
+    const result = await CreateEventsCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: data }
+    )
+    res.send(result)
+
+})
+
+app.delete('/manage-my-events/:id', async (req, res) => {
+    const { id } = req.params;
+    const result = await CreateEventsCollection.deleteOne({ _id: new ObjectId(id) })
+    res.send(result)
+})
+
 
 app.get('/', (req, res) => {
     res.send({ msg: 'server is runnig' })
