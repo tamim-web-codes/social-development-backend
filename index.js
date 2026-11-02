@@ -25,7 +25,7 @@ export async function connectToMongoDB() {
 const mongoclient = await connectToMongoDB()
 const db = mongoclient.db('social-event')
 const CreateEventsCollection = db.collection('add-event')
-const BookingCollection = db.collection('booking')
+const JoindeCollection = db.collection('joinde-events')
 
 
 app.post('/add-create-events', async (req, res) => {
@@ -71,6 +71,12 @@ app.delete('/manage-my-events/:id', async (req, res) => {
     res.send(result)
 })
 
+app.post('/joinde-events', async (req, res) => {
+    const data = req.body
+    const result = await JoindeCollection.insertOne(data)
+    res.send(result)
+    console.log(result);
+})
 
 app.get('/', (req, res) => {
     res.send({ msg: 'server is runnig' })
