@@ -139,5 +139,4 @@ app.listen(PORT, () => {
     console.log(`server is runnig ${PORT}`);
 })
 
-
-// http://localhost:5000/explore-event
+export default app;
