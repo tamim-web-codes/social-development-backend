@@ -38,7 +38,7 @@ const verifyToken = async (req, res, next) => {
     if (!token) {
         return res.status(401).send({ message: 'Unauthorized access' });
     }
-    const JWKS = createRemoteJWKSet(new URL('http://localhost:3000/api/auth/jwks'))
+    const JWKS = createRemoteJWKSet(new URL(`${process.env.FRONTEND_URL}/api/auth/jwks`))
 
     try {
         const { payload } = await jwtVerify(token, JWKS)
@@ -50,7 +50,7 @@ const verifyToken = async (req, res, next) => {
 }
 
 
-app.post('/add-create-events', async (req, res) => {
+app.post('/add-create-events', verifyToken, async (req, res) => {
     const data = req.body;
     const result = await CreateEventsCollection.insertOne(data)
     console.log(result);
@@ -91,7 +91,7 @@ app.get('/manage-my-events/:email', async (req, res) => {
     res.send(result)
 })
 
-app.patch('/manage-my-events/:id', async (req, res) => {
+app.patch('/manage-my-events/:id', verifyToken, async (req, res) => {
     const { id } = req.params
     const data = req.body;
     const result = await CreateEventsCollection.updateOne(
