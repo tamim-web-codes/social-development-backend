@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import { MongoClient, ObjectId } from 'mongodb';
 import 'dotenv/config'
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 const app = express()
 const PORT = 5000
 
@@ -26,6 +27,27 @@ const mongoclient = await connectToMongoDB()
 const db = mongoclient.db('social-event')
 const CreateEventsCollection = db.collection('add-event')
 const JoindeCollection = db.collection('joinde-events')
+
+const verifyToken = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: 'Unauthorized access' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+        return res.status(401).send({ message: 'Unauthorized access' });
+    }
+    const JWKS = createRemoteJWKSet(new URL('http://localhost:3000/api/auth/jwks'))
+
+    try {
+        const { payload } = await jwtVerify(token, JWKS)
+        next();
+    } catch (error) {
+        return res.status(500).send({ message: 'Server Error' });
+    }
+
+}
 
 
 app.post('/add-create-events', async (req, res) => {
@@ -93,7 +115,7 @@ app.post('/joinde-events', async (req, res) => {
     console.log(result);
 })
 
-app.get('/joinde-events/:email', async (req, res) => {
+app.get('/joinde-events/:email', verifyToken, async (req, res) => {
     const { email } = req.params
 
     const result = await JoindeCollection.find({
