@@ -78,6 +78,17 @@ app.post('/joinde-events', async (req, res) => {
     console.log(result);
 })
 
+app.get('/joinde-events/:email', async (req, res) => {
+    const { email } = req.params
+  
+    const result = await JoindeCollection.find({
+         userEmail: email
+    }).toArray()
+    res.send(result)
+    console.log(result);
+})
+
+
 app.get('/', (req, res) => {
     res.send({ msg: 'server is runnig' })
 })
