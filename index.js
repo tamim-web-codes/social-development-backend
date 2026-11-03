@@ -37,10 +37,25 @@ app.post('/add-create-events', async (req, res) => {
 })
 
 app.get('/explore-event', async (req, res) => {
-    const result = await CreateEventsCollection.find().toArray()
-    res.send(result)
 
-})
+    try {
+        const today = new Date().toISOString().split('T')[0];
+
+        const result = await CreateEventsCollection
+            .find({
+                date: { $gte: today }
+            })
+            .sort({ date: 1 })
+            .toArray();
+
+        res.send(result);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            message: 'Failed to fetch events'
+        });
+    }
+});
 
 app.get('/explore-event/:id', async (req, res) => {
     const { id } = req.params;
@@ -80,10 +95,11 @@ app.post('/joinde-events', async (req, res) => {
 
 app.get('/joinde-events/:email', async (req, res) => {
     const { email } = req.params
-  
+
     const result = await JoindeCollection.find({
-         userEmail: email
-    }).toArray()
+        userEmail: email
+    }).sort({ date: 1 })
+        .toArray()
     res.send(result)
     console.log(result);
 })
