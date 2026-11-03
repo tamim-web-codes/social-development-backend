@@ -104,6 +104,10 @@ app.get('/joinde-events/:email', async (req, res) => {
     console.log(result);
 })
 
+app.get('/recent-upcoming-events', async (req, res) => {
+    const result = await CreateEventsCollection.find().limit(6).toArray()
+    res.send(result)
+})
 
 app.get('/', (req, res) => {
     res.send({ msg: 'server is runnig' })
@@ -114,3 +118,4 @@ app.listen(PORT, () => {
 })
 
 
+// http://localhost:5000/explore-event
