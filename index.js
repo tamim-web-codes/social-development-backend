@@ -91,7 +91,7 @@ app.get('/manage-my-events/:email', async (req, res) => {
     res.send(result)
 })
 
-app.patch('/manage-my-events/:id', verifyToken, async (req, res) => {
+app.patch('/manage-my-events/:id', async (req, res) => {
     const { id } = req.params
     const data = req.body;
     const result = await CreateEventsCollection.updateOne(
@@ -108,7 +108,7 @@ app.delete('/manage-my-events/:id', async (req, res) => {
     res.send(result)
 })
 
-app.post('/joinde-events', async (req, res) => {
+app.post('/joinde-events', verifyToken, async (req, res) => {
     const data = req.body
     const result = await JoindeCollection.insertOne(data)
     res.send(result)
