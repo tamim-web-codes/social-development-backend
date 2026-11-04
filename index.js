@@ -3,6 +3,7 @@ import cors from 'cors'
 import { MongoClient, ObjectId } from 'mongodb';
 import 'dotenv/config'
 import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { status } from 'init';
 const app = express()
 const PORT = 5000
 
@@ -110,8 +111,13 @@ app.delete('/manage-my-events/:id', async (req, res) => {
 
 app.post('/joinde-events', verifyToken, async (req, res) => {
     const data = req.body
+    const { eventId, userEmail } = data
+    const exist = await JoindeCollection.findOne({ eventId, userEmail })
+    if (exist) {
+        res.status(409).send({ message: "already exist" });
+    }
     const result = await JoindeCollection.insertOne(data)
-    res.send(result)
+    res.status(201).send(result);
     console.log(result);
 })
 
